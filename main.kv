@@ -1,0 +1,202 @@
+<ScreenFrame>:
+    orientation: 'vertical'
+    cols: 2
+
+    ActionBar:
+        ActionView:
+            pos_hint: {'top':1}
+            use_separator: True
+            ActionPrevious:
+                title: "Семь раз замерь, один раз залей"
+                with_previous: False
+            ActionButton:
+                text: "Настройки"
+    BoxLayout:
+        orientation: 'vertical'
+        cols: 2
+        size_hint: 1, 0.30
+        Button:
+            text: "ИСТОРИЯ"
+        BoxLayout:
+            orientation: 'horizontal'
+            cols: 2
+            size_hint: 1, 1
+
+            Button:
+
+                text: "ХЛЕБЗАВОД"
+                on_release: root.XZ()
+
+            Button:
+
+                text: "ДАЧНАЯ"
+                on_release: root.dacha()
+
+<Start_Screen>:
+    ScreenFrame:
+        BoxLayout:
+            Label:
+                text: "Связь с сервером"
+            Label:
+                text: "???????"
+                id: on_off
+            Button:
+                text: "ОБНОВИТЬ"
+                on_release: root.call_base(on_off)
+<XZ_Screen>:
+    ScreenFrame:
+        BoxLayout:
+            orientation: 'vertical'
+            cols: 2
+            size_hint: 1, 1
+
+            BoxLayout:
+                orientation: 'horizontal'
+                cols: 1
+                size_hint: 1, 1
+
+                Button:
+                    text: "1 - 92\n\n25m2"
+                    id: zavod1
+                    on_press: root.zavod1(zavod1)
+                    on_press: app.root.current = 'save'
+                Button:
+                    text: "2 - 92\n\n25m2"
+                    id: zavod2
+                    on_press: root.zavod2(zavod2)
+                    on_press: app.root.current = 'save'
+
+            BoxLayout:
+                orientation: 'horizontal'
+                cols: 1
+                size_hint: 1, 1
+
+                Button:
+                    text: "3 - 95\n\n15m2"
+                    id: zavod3
+                    on_press: root.zavod3(zavod3)
+                    on_press: app.root.current = 'save'
+                Button:
+                    text: "5 - ДТ\n\n15m2"
+                    id: zavod5
+                    on_press: root.zavod5(zavod5)
+                    on_press: app.root.current = 'save'
+
+            BoxLayout:
+                orientation: 'horizontal'
+                cols: 1
+                size_hint: 1, 1
+
+                Button:
+                    text: "4 - 95\n\n10m2"
+                    id: zavod4
+                    on_press: root.zavod4(zavod4)
+                    on_press: app.root.current = 'save'
+                Button:
+                    text: "6 - ДТ\n\n10m2"
+                    id: zavod6
+                    on_press: root.zavod6(zavod6)
+                    on_press: app.root.current = 'save'
+
+
+<DACHA_Screen>:
+    ScreenFrame:
+        BoxLayout:
+            orientation: 'vertical'
+            cols: 4
+            size_hint: 1, 1
+
+            Button:
+                text: "1 - 92\n\n25m2"
+                id: dacha1
+                on_press: root.dacha1(dacha1)
+                on_press: app.root.current = 'save'
+            Button:
+                text: "2 - 92\n\n25m2"
+                id: dacha2
+                on_press: root.dacha2(dacha2)
+                on_press: app.root.current = 'save'
+            Button:
+                text: "4 - 95\n\n25m2"
+                id: dacha4
+                on_press: root.dacha4(dacha4)
+                on_press: app.root.current = 'save'
+            Button:
+                text: "3 - 95\n\n25m2"
+                id: dacha3
+                on_press: root.dacha3(dacha3)
+                on_press: app.root.current = 'save'
+            Button:
+                text: "5 - 98\n\n25m2"
+                id: dacha5
+                on_press: root.dacha5(dacha5)
+                on_press: app.root.current = 'save'
+            Button:
+                text: "6 - ДТ\n\n25m2"
+                id: dacha6
+                on_press: root.dacha6(dacha6)
+                on_press: app.root.current = 'save'
+
+<Save>:
+    ScreenFrame:
+        BoxLayout:
+            orientation: 'vertical'
+            cols: 4
+            size_hint: 1, 1
+
+            id: container
+
+            Label:
+                text: 'Операторские продажи'
+            TextInput:
+                text: ''
+                input_filter: 'int'
+                id: text_0
+                multiline: False
+
+            Label:
+                text: 'ЗАМЕР ДО СЛИВА (см)'
+            TextInput:
+                text: ''
+                input_filter: 'int'
+                id: text_1
+                multiline: False
+
+
+            Label:
+                text: 'ОБЪЕМ БЕНЗОВОЗА (л)'
+            TextInput:
+                text: ''
+                input_filter: 'int'
+                id: text_2
+                multiline: False
+
+
+            Label:
+                text: 'ЗАМЕР ПОСЛЕ СЛИВА (см)'
+            TextInput:
+                text: ''
+                input_filter: 'int'
+                id: text_3
+                multiline: False
+
+
+            Label:
+                text: 'ПОКАЗАНИЯ СЧЁТЧИКА'
+            TextInput:
+                text: ''
+                input_filter: 'int'
+                id: text_4
+                multiline: False
+
+            Button:
+                text: "ЗАПИСАТЬ В БАЗУ"
+                on_press: root.job(text_0, text_1, text_2, text_3, text_4)
+                on_release: root.clear_inputs()
+                on_press: app.root.current = 'finish'
+
+<Finish>:
+    ScreenFrame:
+        BoxLayout:
+            Label:
+                text: "НОВАЯ ЗАПИСЬ ДОБАВЛЕНА УСПЕШНО"
