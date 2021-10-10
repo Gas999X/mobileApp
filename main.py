@@ -1,6 +1,7 @@
-import psycopg2
-from psycopg2 import Error
-from datetime import date
+# CLIENT GasMeter V0.1
+import socket
+
+import pickle
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -8,11 +9,13 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
 from kivy.uix.textinput import TextInput
 
-from pypostgresql import call_base_see
-
 Builder.load_file("main.kv")
 
+BUFFER_SIZE = 4096
+server_address = ('77.82.91.4', 10000)
+
 barrel = ''
+
 
 class ScreenFrame(BoxLayout):
     def XZ(self):
@@ -25,13 +28,37 @@ class ScreenFrame(BoxLayout):
 
 
 class Start_Screen(Screen):
+
     def call_base(self, on_off):
-        online_base_call = call_base_see()
-        print(int(online_base_call))
-        if (int(online_base_call) == 1):
-            on_off.text = "Сервер Online"
-        else:
-            on_off.text = "Сервер НЕДОСТУПЕН"
+
+        # СоздаемTCP/IP сокет
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Подключаем сокет к порту, через который прослушивается сервер
+        print('Подключено к {} порт {}'.format(*server_address))
+        sock.connect(server_address)
+        all_data = bytearray()
+
+        try:
+            # Отправка данных
+            obj = ['Hello']
+            data = pickle.dumps(obj)
+            sock.sendall(data)
+
+
+            # Смотрим ответ
+            data = sock.recv(BUFFER_SIZE)
+            all_data += data
+            okk = pickle.loads(all_data)
+            print(f'Получено: {okk}')
+            if 'SERVER SQL: ON' in okk[0]:
+                on_off.text = "БАЗЫ ПОДКЛЮЧЕНЫ"
+            elif 'SERVER SQL: OFF' in okk[0]:
+                on_off.text = "БАЗЫ НЕДОСТУПНЫ"
+            else:
+                print("ERROR 1082")
+        finally:
+            print('Закрываем сокет')
+            sock.close()
 
 
 class XZ_Screen(Screen):
@@ -125,68 +152,6 @@ class DACHA_Screen(Screen):
 
 
 class Save(Screen):
-    def job(self, text_0, text_1, text_2, text_3, text_4):
-
-        # Получаем дату сегодня.
-        data = date.today()
-        print(barrel)
-        print(data)
-        print(text_0.text)
-        print(text_1.text)
-        print(text_2.text)
-        print(text_3.text)
-        print(text_4.text)
-        try:
-            connection = psycopg2.connect(user="postgres",
-                                          # пароль, который указали при установке PostgreSQL
-                                          password="Best4KamCH",
-                                          host="127.0.0.1",
-                                          port="5432",
-                                          database="postgres")
-            cursor = connection.cursor()
-            current_id_table = ('select max(id) from {table}')
-            cursor.execute(current_id_table.format(table=barrel))
-            n = cursor.fetchone()
-            max_id = n[0]
-            print(max_id)
-            if max_id is None:
-                y = [1, text_1.text, text_2.text, text_3.text, text_4.text, data, text_0.text]
-                record_to_insert_y = (y)
-                postgres_insert_query_y = """ INSERT INTO {table} (id, first_check, reload, second_check, count, date, sale)
-                                                   VALUES (%s,%s,%s,%s,%s,%s,%s)"""
-                cursor.execute(postgres_insert_query_y.format(table=barrel), record_to_insert_y)
-
-                connection.commit()
-                count = cursor.rowcount
-                print(count, "Запись Y успешно добавлена в таблицу")
-
-                if connection:
-                    cursor.close()
-                    connection.close()
-                    print("Соединение с PostgreSQL закрыто")
-
-            else:
-                max_id += 1
-
-                z = [max_id, text_1.text, text_2.text, text_3.text, text_4.text, data, text_0.text]
-                print(z)
-
-                postgres_insert_query = """ INSERT INTO {table} (id, first_check, reload, second_check, count, date, sale)
-                                                   VALUES (%s,%s,%s,%s,%s,%s,%s)"""
-                record_to_insert = (z)
-                cursor.execute(postgres_insert_query.format(table=barrel), record_to_insert)
-
-                connection.commit()
-                count = cursor.rowcount
-                print(count, "Запись Z успешно добавлена в таблицу")
-
-                if connection:
-                    cursor.close()
-                    connection.close()
-                    print("Соединение с PostgreSQL закрыто")
-
-        except (Exception, Error) as error:
-            print("Ошибка при работе с PostgreSQL", error)
 
     def clear_inputs(self):
         save = self.manager.get_screen('save')
@@ -194,6 +159,37 @@ class Save(Screen):
             if isinstance(child, TextInput):
                 child.text = ''
                 print("CLEAR")
+
+    def send_to_server(self, text_0, text_1, text_2, text_3, text_4):
+
+        # СоздаемTCP/IP сокет
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Подключаем сокет к порту, через который прослушивается сервер
+        print('Подключено к {} порт {}'.format(*server_address))
+        sock.connect(server_address)
+
+        print(barrel)
+        print(text_0.text)
+        print(text_1.text)
+        print(text_2.text)
+        print(text_3.text)
+        print(text_4.text)
+
+        try:
+            # Отправка данных
+            obj = [barrel, text_0.text, text_1.text, text_2.text, text_3.text, text_4.text]
+            print('Отправка:', obj)
+
+            data = pickle.dumps(obj)
+            sock.sendall(data)
+
+            print('Close')
+            sock.close()
+
+        finally:
+            print('Закрываем сокет')
+            sock.close()
+
 
 class Finish(Screen):
     pass

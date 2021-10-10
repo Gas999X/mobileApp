@@ -191,9 +191,10 @@
 
             Button:
                 text: "ЗАПИСАТЬ В БАЗУ"
-                on_press: root.job(text_0, text_1, text_2, text_3, text_4)
+                on_press: root.send_to_server(text_0, text_1, text_2, text_3, text_4)
                 on_release: root.clear_inputs()
                 on_press: app.root.current = 'finish'
+
 
 <Finish>:
     ScreenFrame:
